@@ -23,7 +23,6 @@
         {
             this._amountAvailable -= change;
         }
-
         public bool GetChange(int userAmount)
         {
             if (userAmount > 0)

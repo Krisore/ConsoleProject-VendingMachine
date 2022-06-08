@@ -4,11 +4,11 @@
     {
 
         int input = 0;
-        private Item[,] _shelve;
+        private readonly Item[,] _shelve;
         private readonly Display _machineDisplay;
-        private Transactor _machineTransactor;
-        private Keypad _machineKeypad;
-        private int userAmount;
+        private readonly Transactor _machineTransactor;
+        private readonly Keypad _machineKeypad;
+        private int _userAmount;
 
         public VendingMachineController(Item[,] items)
         {
@@ -16,7 +16,7 @@
             this._machineKeypad = new Keypad();
             this._machineDisplay = new Display();
             this._machineTransactor = new Transactor();
-            this.userAmount = 0;
+            this._userAmount = 0;
         }
 
         public void TurnOn()
@@ -35,31 +35,31 @@
                         var bill = _machineKeypad.ReadKeyInput();
                         if (_machineTransactor.AddAmount(bill))
                         {
-                            userAmount += bill;
-                            _machineDisplay.DisplayMethod($"Your Current Bill Balance:${userAmount}");
+                            _userAmount += bill;
+                            _machineDisplay.DisplayMethod($"Your Current Bill Balance:${_userAmount}");
                             Thread.Sleep(3000);
                         }
                         else
                         {
                             Console.WriteLine("You Entered Invalid Bill");
-                            _machineDisplay.DisplayMethod($"Your Current Bill Balance ${userAmount}");
+                            _machineDisplay.DisplayMethod($"Your Current Bill Balance ${_userAmount}");
                         }
                         break;
                     case 2:
                         _machineDisplay.DisplayMethod(this._shelve);
-                        _machineDisplay.DisplayMethod($"Your Current Balance ${userAmount} \n");
+                        _machineDisplay.DisplayMethod($"Your Current Balance ${_userAmount} \n");
                         Console.Write("Select Slot : ");
                         int slot = _machineKeypad.ReadKeyInput();
                         BuyProduct(slot);
                         break;
                     case 3:
-                        if (_machineTransactor.GetChange(userAmount))
+                        if (_machineTransactor.GetChange(_userAmount))
                         {
-                            _machineDisplay.DisplayMethod($"Please Collect your change ${userAmount} from Change Dispenser");
+                            _machineDisplay.DisplayMethod($"Please Collect your change ${_userAmount} from Change Dispenser");
                         }
                         break;
                     case 4:
-                        if (userAmount == 0)
+                        if (_userAmount == 0)
                         {
                             _machineDisplay.DisplayMethod("Thank You for Using the Vendy!\n");
                             Thread.Sleep(2000);
@@ -69,9 +69,9 @@
                         else
                         {
                             _machineDisplay.DisplayMethod("OOPS! You Forgot to Collect your change");
-                            _machineDisplay.DisplayMethod(("Please Collect Your Change $" + userAmount + " from the Cash Dispenser\n"));
+                            _machineDisplay.DisplayMethod(("Please Collect Your Change $" + _userAmount + " from the Cash Dispenser\n"));
                             _machineDisplay.DisplayMethod("Thank You for Using the Vendy!\n");
-                            userAmount = 0;
+                            _userAmount = 0;
                             Thread.Sleep(4000);
                             Console.Clear();
                             _machineDisplay.WelcomeMessage();
@@ -96,13 +96,13 @@
             {
                 if (_shelve[row, column] != null)
                 {
-                    if (_shelve[row, column].Price <= userAmount)
+                    if (_shelve[row, column].Price <= _userAmount)
                     {
                         Console.Clear();
                         _machineDisplay.DisplayMethod("You've Bought:");
                         _machineDisplay.DisplayMethod(_shelve[row, column].DisplayMessage() + "\n");
                         _machineDisplay.DisplayMethod("Please Pick your " + _shelve[row, column].ItemName + " from the Dispenser\n");
-                        userAmount -= this._shelve[row, column].Price;
+                        _userAmount -= this._shelve[row, column].Price;
                         _shelve[row, column] = null;
 
                         Thread.Sleep(1000);
